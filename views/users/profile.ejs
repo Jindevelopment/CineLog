@@ -1,0 +1,68 @@
+<%- include('../partials/header', { title: profileUser.username + '님의 프로필' }) %>
+
+<div class="profile-header">
+  <div class="profile-avatar"><%- include('../partials/avatar', { src: profileUser.avatar, name: profileUser.username, size: 80 }) %></div>
+  <div class="profile-info">
+    <h1><%= profileUser.username %>
+      <% if (currentUser && currentUser.id === profileUser.id) { %>
+        <span class="muted" style="font-size:0.9rem">( 나 )</span>
+      <% } %>
+    </h1>
+    <p class="bio"><%= profileUser.bio || '자기소개가 없습니다.' %></p>
+    <p class="muted">가입일: <%= new Date(profileUser.createdAt).toLocaleDateString('ko-KR') %></p>
+    <% if (currentUser && currentUser.id === profileUser.id) { %>
+      <a href="/users/<%= profileUser.id %>/edit" class="btn sm">✏️ 프로필 수정</a>
+    <% } %>
+  </div>
+</div>
+
+<!-- 통계 -->
+<section class="stats-grid">
+  <div class="stat-box">
+    <span class="stat-big"><%= watched.length %></span>
+    <span class="stat-desc">봤어요 ✅</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= avgRating %></span>
+    <span class="stat-desc">평균 별점 ⭐</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= topGenre %></span>
+    <span class="stat-desc">최애 장르 🎭</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= reviews.length %></span>
+    <span class="stat-desc">전체 기록</span>
+  </div>
+</section>
+
+<!-- 작성한 리뷰 목록 -->
+<section class="section">
+  <h2>최근 리뷰</h2>
+  <% if (reviews.length === 0) { %>
+    <p class="muted">아직 작성한 리뷰가 없습니다.</p>
+  <% } else { %>
+    <div class="movie-grid">
+      <% reviews.slice(0, 12).forEach(r => { %>
+        <a href="/reviews/<%= r.id %>" class="movie-card">
+          <% if (r.moviePoster) { %>
+            <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>"
+                 alt="<%= r.movieTitle %>" class="movie-poster">
+          <% } else { %>
+            <div class="movie-poster no-poster">🎬</div>
+          <% } %>
+          <div class="movie-info">
+            <p class="movie-title"><%= r.movieTitle %></p>
+            <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<div class="actions">
+  <a href="/reviews" class="btn">← 전체 리뷰</a>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,19 @@
+# 의존성
+node_modules/
+
+# 환경변수 (실제 키 — 절대 커밋 금지!)
+.env
+.env.*
+!.env.example
+
+# 로그·임시
+*.log
+npm-debug.log*
+scripts/_body*.json
+
+# Claude / 에디터 / OS
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

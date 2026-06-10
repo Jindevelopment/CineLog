@@ -1,0 +1,43 @@
+<%- include('../partials/header', { title: '로그인' }) %>
+
+<div class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">🎬 CineLog</div>
+    <h1 class="auth-title">로그인</h1>
+
+    <% if (typeof notice !== 'undefined' && notice) { %>
+      <p class="notice"><%= notice %></p>
+    <% } %>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/login" method="POST" class="form">
+      <label>
+        이메일
+        <input type="email" name="email" required autocomplete="email" placeholder="이메일을 입력하세요">
+      </label>
+      <label>
+        비밀번호
+        <input type="password" name="password" required autocomplete="current-password" placeholder="비밀번호를 입력하세요">
+      </label>
+      <button type="submit" class="btn primary full">로그인</button>
+    </form>
+
+    <div class="oauth-divider"><span>또는</span></div>
+    <div class="oauth-buttons">
+      <a href="/auth/google" class="btn full oauth-btn oauth-google">
+        <svg class="oauth-ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google로 계속하기
+      </a>
+      <a href="/auth/kakao" class="btn full oauth-btn oauth-kakao">
+        <svg class="oauth-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="#191600" d="M12 3C6.48 3 2 6.48 2 10.8c0 2.79 1.86 5.23 4.65 6.61-.2.72-.73 2.62-.84 3.03-.13.51.19.5.4.36.16-.11 2.6-1.77 3.66-2.49.69.1 1.4.15 2.13.15 5.52 0 10-3.48 10-7.82C22 6.48 17.52 3 12 3z"/></svg>
+        카카오로 계속하기
+      </a>
+    </div>
+
+    <p class="auth-footer">아직 회원이 아니신가요? <a href="/signup">회원가입</a></p>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

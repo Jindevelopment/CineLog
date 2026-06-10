@@ -1,0 +1,74 @@
+<%- include('../partials/header', { title: '리뷰 작성' }) %>
+
+<div class="page-header">
+  <h1>✍️ 리뷰 작성</h1>
+</div>
+
+<% if (error) { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<div class="review-form-wrap">
+  <!-- 선택된 영화 미리보기 -->
+  <% if (movieTitle) { %>
+  <div class="selected-movie">
+    <% if (moviePoster) { %>
+      <img src="https://image.tmdb.org/t/p/w154<%= moviePoster %>" alt="<%= movieTitle %>" class="selected-poster">
+    <% } %>
+    <div>
+      <p class="movie-title" style="font-size:1.2rem"><%= movieTitle %></p>
+      <% if (movieYear) { %><p class="muted"><%= movieYear %>년 개봉</p><% } %>
+    </div>
+  </div>
+  <% } %>
+
+  <form action="/reviews" method="POST" class="form">
+    <!-- 숨김 필드 — TMDB 영화 정보 -->
+    <input type="hidden" name="movieId"     value="<%= movieId || '' %>">
+    <input type="hidden" name="movieTitle"  value="<%= movieTitle || '' %>">
+    <input type="hidden" name="moviePoster" value="<%= moviePoster || '' %>">
+    <input type="hidden" name="movieGenre"  value="<%= movieGenre || '' %>">
+    <input type="hidden" name="movieYear"   value="<%= movieYear || '' %>">
+    <input type="hidden" name="mediaType"   value="<%= typeof mediaType !== 'undefined' && mediaType ? mediaType : 'movie' %>">
+
+    <% if (!movieTitle) { %>
+    <label>
+      영화 제목 <span class="required">*</span>
+      <input name="movieTitle" required maxlength="100" placeholder="영화 제목을 직접 입력하세요">
+    </label>
+    <% } %>
+
+    <label>
+      별점 <span class="required">*</span>
+      <div class="star-select" id="starSelect">
+        <% for (let i = 1; i <= 5; i++) { %>
+          <span class="star-opt" data-val="<%= i %>">★</span>
+        <% } %>
+        <input type="hidden" name="rating" id="ratingInput" required>
+        <span class="star-hint muted">별점을 선택하세요</span>
+      </div>
+    </label>
+
+    <label>
+      관람 상태 <span class="required">*</span>
+      <select name="status" class="select-box">
+        <option value="watched">✅ 봤어요</option>
+        <option value="watching">⏳ 보는 중</option>
+        <option value="want">🔖 보고싶어요</option>
+        <option value="drop">❌ 안 볼래요</option>
+      </select>
+    </label>
+
+    <label>
+      감상문 <span class="required">*</span>
+      <textarea name="content" rows="6" required placeholder="이 영화에 대한 솔직한 감상을 남겨주세요..."></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="btn primary">리뷰 저장</button>
+      <a href="/reviews" class="btn">취소</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

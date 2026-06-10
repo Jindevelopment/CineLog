@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' — CineLog' : 'CineLog' %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a href="/">🎬 CineLog</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="메뉴">&#9776;</button>
+    <nav class="menu" id="nav-menu">
+      <a href="/reviews">영화 리뷰</a>
+      <a href="/reviews/search">영화 검색</a>
+      <a href="/recommend">🤖 AI 추천</a>
+      <% if (currentUser) { %>
+        <% if (currentUser.username === 'admin') { %>
+          <a href="/admin" class="admin-link">⚙️ 관리자</a>
+        <% } %>
+        <a href="/mypage">마이페이지</a>
+        <a href="/users/<%= currentUser.id %>" class="user-name"><%- include('avatar', { src: avatarOf(currentUser.id), name: currentUser.username, size: 24 }) %> <%= currentUser.username %></a>
+        <form action="/logout" method="POST" class="inline">
+          <button class="link-btn">로그아웃</button>
+        </form>
+      <% } else { %>
+        <a href="/login">로그인</a>
+        <a href="/signup">회원가입</a>
+      <% } %>
+      <!-- 다크/라이트 토글 -->
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 변경">☀️</button>
+    </nav>
+  </header>
+
+  <main class="container">

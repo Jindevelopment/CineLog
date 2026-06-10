@@ -1,0 +1,11 @@
+<%
+  // 재사용 아바타: src(이미지 경로|null) · name(폴백 이니셜용) · size(px)
+  const _src  = (typeof src  !== 'undefined') ? src : null
+  const _name = (typeof name !== 'undefined' && name) ? String(name) : '?'
+  const _size = (typeof size !== 'undefined') ? size : 32
+-%>
+<% if (_src) { -%>
+<img class="avatar" src="<%= _src %>" alt="<%= _name %>" style="width:<%= _size %>px;height:<%= _size %>px" loading="lazy">
+<% } else { -%>
+<span class="avatar avatar-fallback" style="width:<%= _size %>px;height:<%= _size %>px;font-size:<%= Math.round(_size * 0.45) %>px"><%= _name.charAt(0).toUpperCase() %></span>
+<% } -%>

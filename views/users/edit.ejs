@@ -1,0 +1,63 @@
+<%- include('../partials/header', { title: '프로필 수정' }) %>
+
+<div class="page-header">
+  <h1>⚙️ 프로필 설정</h1>
+</div>
+
+<% if (error) { %><p class="error"><%= error %></p><% } %>
+<% if (success) { %><p class="success"><%= success %></p><% } %>
+
+<!-- 프로필 이미지 업로드 (multer) -->
+<div class="settings-box">
+  <h2>프로필 이미지</h2>
+  <div class="avatar-edit">
+    <%- include('../partials/avatar', { src: user.avatar, name: user.username, size: 88 }) %>
+    <form action="/users/<%= user.id %>/avatar" method="POST" enctype="multipart/form-data" class="avatar-form">
+      <input type="file" name="avatar" accept="image/*" required class="file-input">
+      <div class="avatar-form-actions">
+        <button type="submit" class="btn primary">이미지 업로드</button>
+        <span class="muted" style="font-size:0.82rem">JPG·PNG·GIF·WEBP · 최대 2MB</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 프로필 수정 -->
+<div class="settings-box">
+  <h2>프로필 수정</h2>
+  <form action="/users/<%= user.id %>/edit" method="POST" class="form">
+    <label>
+      닉네임
+      <input name="username" value="<%= user.username %>" required minlength="2" maxlength="20"
+             placeholder="2~20자 닉네임">
+    </label>
+    <label>
+      자기소개
+      <input name="bio" value="<%= user.bio || '' %>" maxlength="100"
+             placeholder="영화 취향을 한 줄로 소개해보세요">
+    </label>
+    <button type="submit" class="btn primary">저장</button>
+  </form>
+</div>
+
+<!-- 비밀번호 변경 -->
+<div class="settings-box">
+  <h2>비밀번호 변경</h2>
+  <form action="/users/<%= user.id %>/password" method="POST" class="form">
+    <label>
+      현재 비밀번호
+      <input type="password" name="currentPassword" required placeholder="현재 비밀번호">
+    </label>
+    <label>
+      새 비밀번호
+      <input type="password" name="newPassword" required minlength="4" placeholder="4자 이상">
+    </label>
+    <button type="submit" class="btn primary">변경</button>
+  </form>
+</div>
+
+<div class="actions">
+  <a href="/mypage" class="btn">← 마이페이지</a>
+</div>
+
+<%- include('../partials/footer') %>

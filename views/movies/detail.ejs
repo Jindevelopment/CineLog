@@ -1,0 +1,127 @@
+<%- include('../partials/header', { title: movie.title }) %>
+
+<!-- 백드롭 배너 -->
+<% if (movie.backdrop) { %>
+<div class="movie-hero" style="background-image:url('https://image.tmdb.org/t/p/w1280<%= movie.backdrop %>')">
+  <div class="movie-hero-overlay"></div>
+</div>
+<% } %>
+
+<div class="md-top <%= movie.backdrop ? 'has-hero' : '' %>">
+  <div class="md-poster">
+    <% if (movie.poster) { %>
+      <img src="https://image.tmdb.org/t/p/w342<%= movie.poster %>" alt="<%= movie.title %>">
+    <% } else { %>
+      <div class="no-poster large"><%= movie.type === 'tv' ? '📺' : '🎬' %></div>
+    <% } %>
+  </div>
+
+  <div class="md-info">
+    <h1>
+      <%= movie.title %>
+      <% if (movie.year) { %><span class="md-year"><%= movie.year %></span><% } %>
+    </h1>
+    <% if (movie.originalTitle && movie.originalTitle !== movie.title) { %>
+      <p class="md-original"><%= movie.originalTitle %></p>
+    <% } %>
+
+    <div class="md-badges">
+      <span class="type-badge <%= movie.type === 'tv' ? 'badge-tv' : 'badge-movie' %>"><%= movie.type === 'tv' ? 'TV' : '영화' %></span>
+      <% if (movie.rating) { %><span class="md-rating">⭐ <%= movie.rating %> <span class="muted">(<%= movie.voteCount.toLocaleString() %>표)</span></span><% } %>
+      <% if (movie.runtime) { %><span class="muted">⏱ <%= movie.runtime %>분</span><% } %>
+      <% if (movie.type === 'tv' && movie.seasons) { %><span class="muted">📚 시즌 <%= movie.seasons %> · <%= movie.episodes %>화</span><% } %>
+    </div>
+
+    <% if (movie.genres.length) { %>
+      <div class="genre-tags">
+        <% movie.genres.forEach(g => { %><span class="genre-tag"><%= g %></span><% }) %>
+      </div>
+    <% } %>
+
+    <% if (movie.tagline) { %><p class="md-tagline">“<%= movie.tagline %>”</p><% } %>
+    <% if (movie.overview) { %><p class="md-overview"><%= movie.overview %></p><% } %>
+
+    <div class="md-facts">
+      <% if (movie.director) { %>
+        <div class="fact"><span class="fact-k"><%= movie.type === 'tv' ? '제작' : '감독' %></span>
+          <span class="fact-v"><a href="/movies/person/<%= movie.director.id %>"><%= movie.director.name %></a></span></div>
+      <% } %>
+      <% if (movie.country) { %><div class="fact"><span class="fact-k">제작국가</span><span class="fact-v"><%= movie.country %></span></div><% } %>
+      <% if (movie.releaseDate) { %><div class="fact"><span class="fact-k"><%= movie.type === 'tv' ? '첫 방영' : '개봉일' %></span><span class="fact-v"><%= movie.releaseDate %></span></div><% } %>
+    </div>
+
+    <div class="actions">
+      <% if (currentUser) { %>
+        <a class="btn primary" href="/reviews/new?movieId=<%= movie.id %>&movieTitle=<%= encodeURIComponent(movie.title) %>&moviePoster=<%= encodeURIComponent(movie.poster || '') %>&movieYear=<%= movie.year %>&movieGenre=<%= encodeURIComponent(movie.genres.join(', ')) %>&mediaType=<%= movie.type %>">✍️ 리뷰 쓰기</a>
+      <% } %>
+      <% if (movie.trailer) { %>
+        <a class="btn trailer-btn" href="https://www.youtube.com/watch?v=<%= movie.trailer %>" target="_blank" rel="noopener">▶ 예고편</a>
+      <% } %>
+      <a class="btn" href="/reviews/search?type=<%= movie.type %>">← 검색으로</a>
+    </div>
+  </div>
+</div>
+
+<!-- 출연진 -->
+<% if (movie.cast.length) { %>
+<section class="section">
+  <div class="section-header"><h2>👥 출연진</h2></div>
+  <div class="cast-grid">
+    <% movie.cast.forEach(c => { %>
+      <a class="cast-card" href="/movies/person/<%= c.id %>">
+        <% if (c.profile) { %>
+          <img class="cast-photo" src="https://image.tmdb.org/t/p/w185<%= c.profile %>" alt="<%= c.name %>" loading="lazy">
+        <% } else { %>
+          <div class="cast-photo no-photo">👤</div>
+        <% } %>
+        <p class="cast-name"><%= c.name %></p>
+        <% if (c.character) { %><p class="cast-role muted"><%= c.character %></p><% } %>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<!-- CineLog 리뷰 -->
+<% if (localReviews.length) { %>
+<section class="section">
+  <div class="section-header"><h2>📝 CineLog 리뷰 <span class="muted" style="font-size:1rem">(<%= localReviews.length %>)</span></h2></div>
+  <div class="movie-grid">
+    <% localReviews.forEach(r => { %>
+      <a href="/reviews/<%= r.id %>" class="movie-card">
+        <% if (r.moviePoster) { %>
+          <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+        <% } else { %><div class="movie-poster no-poster">🎬</div><% } %>
+        <div class="movie-info">
+          <p class="movie-title"><%= r.movieTitle %></p>
+          <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+          <p class="movie-author">by <%= r.authorName %></p>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<!-- 비슷한 작품 -->
+<% if (movie.similar.length) { %>
+<section class="section">
+  <div class="section-header"><h2>🎞 비슷한 작품</h2></div>
+  <div class="movie-grid">
+    <% movie.similar.forEach(s => { %>
+      <a href="/movies/<%= s.type %>/<%= s.id %>" class="movie-card">
+        <img src="https://image.tmdb.org/t/p/w300<%= s.poster %>" alt="<%= s.title %>" class="movie-poster" loading="lazy">
+        <div class="movie-info">
+          <p class="movie-title"><%= s.title %></p>
+          <div class="movie-meta">
+            <% if (s.year) { %><span class="muted" style="font-size:0.8rem"><%= s.year %></span><% } %>
+            <% if (s.rating) { %><span class="muted" style="font-size:0.8rem">⭐ <%= s.rating %></span><% } %>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<%- include('../partials/footer') %>

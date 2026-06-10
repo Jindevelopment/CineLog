@@ -1,0 +1,140 @@
+<%- include('partials/header', { title: '마이페이지' }) %>
+
+<div class="profile-header">
+  <div class="profile-avatar"><%- include('partials/avatar', { src: user.avatar, name: currentUser.username, size: 80 }) %></div>
+  <div class="profile-info">
+    <h1><%= currentUser.username %> <span class="muted" style="font-size:1rem">님의 CineLog</span></h1>
+    <p class="bio"><%= user.bio || '자기소개가 없습니다.' %></p>
+    <a href="/users/<%= currentUser.id %>/edit" class="btn sm">✏️ 프로필 수정</a>
+  </div>
+</div>
+
+<!-- 개인 통계 -->
+<section class="stats-grid">
+  <div class="stat-box">
+    <span class="stat-big"><%= watched.length %></span>
+    <span class="stat-desc">봤어요 ✅</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= watching.length %></span>
+    <span class="stat-desc">보는 중 ⏳</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= want.length %></span>
+    <span class="stat-desc">보고싶어요 🔖</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= avgRating %></span>
+    <span class="stat-desc">평균 별점 ⭐</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-big"><%= topGenre %></span>
+    <span class="stat-desc">최애 장르 🎭</span>
+  </div>
+</section>
+
+<!-- 탭: 상태별 리뷰 목록 -->
+<section class="section">
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-tab="all">전체 (<%= myReviews.length %>)</button>
+    <button class="tab-btn" data-tab="watched">봤어요 (<%= watched.length %>)</button>
+    <button class="tab-btn" data-tab="watching">보는 중 (<%= watching.length %>)</button>
+    <button class="tab-btn" data-tab="want">보고싶어요 (<%= want.length %>)</button>
+  </div>
+
+  <% const statusLabel = { watched: '✅ 봤어요', watching: '⏳ 보는 중', want: '🔖 보고싶어요', drop: '❌ 안 볼래요' } %>
+
+  <div class="tab-content active" id="tab-all">
+    <% if (myReviews.length === 0) { %>
+      <p class="muted">아직 기록한 영화가 없습니다. <a href="/reviews/search">영화를 검색</a>해보세요!</p>
+    <% } else { %>
+      <div class="movie-grid">
+        <% myReviews.forEach(r => { %>
+          <a href="/reviews/<%= r.id %>" class="movie-card">
+            <% if (r.moviePoster) { %>
+              <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+            <% } else { %>
+              <div class="movie-poster no-poster">🎬</div>
+            <% } %>
+            <div class="movie-info">
+              <p class="movie-title"><%= r.movieTitle %></p>
+              <div class="movie-meta">
+                <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+                <span class="status-badge status-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span>
+              </div>
+              <p class="muted" style="font-size:0.8rem"><%= new Date(r.createdAt).toLocaleDateString('ko-KR') %></p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="tab-content" id="tab-watched">
+    <div class="movie-grid">
+      <% watched.forEach(r => { %>
+        <a href="/reviews/<%= r.id %>" class="movie-card">
+          <% if (r.moviePoster) { %>
+            <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+          <% } else { %>
+            <div class="movie-poster no-poster">🎬</div>
+          <% } %>
+          <div class="movie-info">
+            <p class="movie-title"><%= r.movieTitle %></p>
+            <div class="movie-meta">
+              <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+              <span class="status-badge status-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span>
+            </div>
+            <p class="muted" style="font-size:0.8rem"><%= new Date(r.createdAt).toLocaleDateString('ko-KR') %></p>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-watching">
+    <div class="movie-grid">
+      <% watching.forEach(r => { %>
+        <a href="/reviews/<%= r.id %>" class="movie-card">
+          <% if (r.moviePoster) { %>
+            <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+          <% } else { %>
+            <div class="movie-poster no-poster">🎬</div>
+          <% } %>
+          <div class="movie-info">
+            <p class="movie-title"><%= r.movieTitle %></p>
+            <div class="movie-meta">
+              <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+              <span class="status-badge status-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span>
+            </div>
+            <p class="muted" style="font-size:0.8rem"><%= new Date(r.createdAt).toLocaleDateString('ko-KR') %></p>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-want">
+    <div class="movie-grid">
+      <% want.forEach(r => { %>
+        <a href="/reviews/<%= r.id %>" class="movie-card">
+          <% if (r.moviePoster) { %>
+            <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+          <% } else { %>
+            <div class="movie-poster no-poster">🎬</div>
+          <% } %>
+          <div class="movie-info">
+            <p class="movie-title"><%= r.movieTitle %></p>
+            <div class="movie-meta">
+              <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+              <span class="status-badge status-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span>
+            </div>
+            <p class="muted" style="font-size:0.8rem"><%= new Date(r.createdAt).toLocaleDateString('ko-KR') %></p>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

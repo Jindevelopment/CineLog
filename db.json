@@ -1,0 +1,234 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "$2b$10$MX1P7iSvpAzwfEl/lTr.3uqSiAJ6WEDooxkLhTNTIoh8E7NpHKdRO",
+      "bio": "CineLog 사이트 관리자입니다.",
+      "createdAt": 1780300000000,
+      "avatar": "/uploads/avatars/seed-admin.svg"
+    },
+    {
+      "id": 2,
+      "username": "jinhyeok1001",
+      "password": "$2b$10$x0.qu8xRU9Ik6dTGDkNKROcHwyiaPxfnVa16ndOCC0Wq5Sb5fKzOG",
+      "bio": "액션/스릴러 매니아 🎬",
+      "createdAt": 1780730779332,
+      "avatar": "/uploads/avatars/user-2-1781074459417.jpg"
+    },
+    {
+      "id": 3,
+      "username": "moviefan",
+      "password": "$2b$10$fKDDjydkDpiDddtownJGHu2o.hXEdlwE9qYE69V6VejRWJleQSwwy",
+      "bio": "감성 영화와 드라마를 사랑합니다 🍿",
+      "createdAt": 1780400000000,
+      "avatar": "/uploads/avatars/seed-moviefan.svg"
+    },
+    {
+      "id": 4,
+      "username": "cinephile",
+      "password": "$2b$10$svvuXgH3QjBreDq4v5s9QuMBfIdb6oGr94xyHXkDrsP30kUezt8GC",
+      "bio": "주말엔 극장에서 삽니다 🎥",
+      "createdAt": 1780500000000,
+      "avatar": "/uploads/avatars/seed-cinephile.svg"
+    },
+    {
+      "id": 5,
+      "username": "jh1234",
+      "password": "$2b$10$lxNhM19FI3VV0IvYiLwCGe3yA2YyG14Cw467KugvqnFRUTnO/xReK",
+      "bio": "공포/스릴러가 좋아요",
+      "createdAt": 1781073303547,
+      "avatar": "/uploads/avatars/seed-jh1234.svg"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "movieId": "496243",
+      "movieTitle": "기생충",
+      "moviePoster": "/jjHccoFjbqlfr4VGLVLT7yek0Xn.jpg",
+      "movieGenre": "코미디, 스릴러, 드라마",
+      "movieYear": "2019",
+      "authorId": 3,
+      "authorName": "moviefan",
+      "rating": 5,
+      "content": "계단으로 표현한 계급의 수직 구조가 압권이었다. 봉준호 감독의 디테일이 장면마다 살아 있어서 두 번째 관람에서 더 많은 것이 보였다. 한국 영화의 자부심이라 할 만한 작품.",
+      "status": "watched",
+      "likes": 3,
+      "likedBy": [
+        4,
+        1,
+        2
+      ],
+      "views": 37,
+      "createdAt": 1780600000000
+    },
+    {
+      "id": 2,
+      "movieId": "157336",
+      "movieTitle": "인터스텔라",
+      "moviePoster": "/evoEi8SBSvIIEveM3V6nCJ6vKj8.jpg",
+      "movieGenre": "모험, 드라마, SF",
+      "movieYear": "2014",
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "rating": 5,
+      "content": "과학적 상상력과 부녀간의 사랑을 시간이라는 축으로 엮어낸 명작. 한스 짐머의 OST가 흐르는 도킹 장면은 몇 번을 봐도 소름이 돋는다.",
+      "status": "watched",
+      "likes": 2,
+      "likedBy": [
+        3,
+        4
+      ],
+      "views": 21,
+      "createdAt": 1780620000000
+    },
+    {
+      "id": 3,
+      "movieId": "479718",
+      "movieTitle": "범죄도시",
+      "moviePoster": "/sVwbHA4nhw389PwpDzkJam4WMoB.jpg",
+      "movieGenre": "액션, 범죄, 스릴러",
+      "movieYear": "2017",
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "rating": 4,
+      "content": "마동석의 묵직한 액션과 윤계상의 서늘한 연기가 팽팽하게 부딪힌다. 군더더기 없이 시원하게 달리는 한국형 범죄 액션의 교과서.",
+      "status": "watched",
+      "likes": 2,
+      "likedBy": [
+        4,
+        3
+      ],
+      "views": 23,
+      "createdAt": 1780640000000
+    },
+    {
+      "id": 4,
+      "movieId": "299534",
+      "movieTitle": "어벤져스: 엔드게임",
+      "moviePoster": "/z7ilT5rNN9kDo8JZmgyhM6ej2xv.jpg",
+      "movieGenre": "모험, SF, 액션",
+      "movieYear": "2019",
+      "authorId": 4,
+      "authorName": "cinephile",
+      "rating": 5,
+      "content": "11년간 쌓아 온 22편의 서사가 한 점으로 모이는 순간, 극장 전체가 숨을 멈췄다. \"Avengers, Assemble\" 한 마디에 소름이 돋던 그 경험을 잊을 수 없다.",
+      "status": "watched",
+      "likes": 2,
+      "likedBy": [
+        2,
+        3
+      ],
+      "views": 35,
+      "createdAt": 1780660000000
+    },
+    {
+      "id": 5,
+      "movieId": "313369",
+      "movieTitle": "라라랜드",
+      "moviePoster": "/ad9ndytwOckyShSc0A6tx1rZRkW.jpg",
+      "movieGenre": "코미디, 드라마, 로맨스",
+      "movieYear": "2016",
+      "authorId": 3,
+      "authorName": "moviefan",
+      "rating": 4,
+      "content": "꿈과 사랑 사이에서 무엇 하나 놓지 못하는 두 사람의 이야기. 마지막 에필로그의 '만약에'가 오래도록 마음에 남는다.",
+      "status": "want",
+      "likes": 1,
+      "likedBy": [
+        2
+      ],
+      "views": 12,
+      "createdAt": 1780680000000
+    },
+    {
+      "id": 6,
+      "movieId": "479718",
+      "movieTitle": "범죄도시",
+      "moviePoster": "/sVwbHA4nhw389PwpDzkJam4WMoB.jpg",
+      "movieGenre": "액션, 범죄, 스릴러",
+      "movieYear": "2017",
+      "mediaType": "movie",
+      "authorId": 3,
+      "authorName": "moviefan",
+      "rating": 5,
+      "content": "난 진짜 재밌게 봤어",
+      "status": "watched",
+      "likes": 0,
+      "likedBy": [],
+      "views": 4,
+      "createdAt": 1780841041286
+    },
+    {
+      "id": 7,
+      "movieId": "33238",
+      "movieTitle": "런닝맨",
+      "moviePoster": "/15SMnscZqd7HZ0bzruatOcKUlOV.jpg",
+      "movieGenre": "코미디, Reality",
+      "movieYear": "2010",
+      "mediaType": "tv",
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "rating": 5,
+      "content": "항상 재밌게 봐요!",
+      "status": "watching",
+      "likes": 0,
+      "likedBy": [],
+      "views": 5,
+      "createdAt": 1781074546869
+    },
+    {
+      "id": 8,
+      "movieId": "1375646",
+      "movieTitle": "군체",
+      "moviePoster": "/thK6glS5pklrlijsgSN6Hw9GLQK.jpg",
+      "movieGenre": "액션, 스릴러, 공포",
+      "movieYear": "2026",
+      "mediaType": "movie",
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "rating": 1,
+      "content": "너무 궁금해요!",
+      "status": "want",
+      "likes": 0,
+      "likedBy": [],
+      "views": 1,
+      "createdAt": 1781074716347
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "reviewId": 1,
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "content": "저도 두 번 봤는데 볼 때마다 새로운 디테일이 보이더라고요. 완전 공감합니다!",
+      "createdAt": 1780601000000
+    },
+    {
+      "id": 2,
+      "reviewId": 1,
+      "authorId": 4,
+      "authorName": "cinephile",
+      "content": "지하실 장면에서 정말 소름 돋았어요. 명작 인정합니다 👍",
+      "createdAt": 1780602000000
+    },
+    {
+      "id": 3,
+      "reviewId": 2,
+      "authorId": 3,
+      "authorName": "moviefan",
+      "content": "OST 듣고 싶어서 또 보게 되는 마법... 인터스텔라 정말 최고죠.",
+      "createdAt": 1780621000000
+    },
+    {
+      "id": 4,
+      "reviewId": 7,
+      "authorId": 2,
+      "authorName": "jinhyeok1001",
+      "content": "유재석 너무 좋아요",
+      "createdAt": 1781074628578
+    }
+  ]
+}

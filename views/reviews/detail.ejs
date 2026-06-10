@@ -1,0 +1,174 @@
+<%- include('../partials/header', { title: review.movieTitle }) %>
+
+<% const statusLabel = { watched: '✅ 봤어요', watching: '⏳ 보는 중', want: '🔖 보고싶어요', drop: '❌ 안 볼래요' } %>
+
+<div class="detail-wrap">
+  <!-- 영화 포스터 -->
+  <div class="detail-poster">
+    <% if (review.moviePoster) { %>
+      <img src="https://image.tmdb.org/t/p/w300<%= review.moviePoster %>"
+           alt="<%= review.movieTitle %>">
+    <% } else { %>
+      <div class="no-poster large">🎬</div>
+    <% } %>
+  </div>
+
+  <!-- 리뷰 본문 -->
+  <div class="detail-content">
+    <h1><%= review.movieTitle %></h1>
+    <div class="review-meta">
+      <span class="stars-lg"><%= '★'.repeat(review.rating) %><%= '☆'.repeat(5 - review.rating) %></span>
+      <span class="status-badge status-<%= review.status %>"><%= statusLabel[review.status] || review.status %></span>
+      <% if (review.movieYear) { %><span class="muted"><%= review.movieYear %>년</span><% } %>
+    </div>
+
+    <div class="review-byline">
+      <a href="/users/<%= review.authorId %>" class="author-link"><%- include('../partials/avatar', { src: avatarOf(review.authorId), name: review.authorName, size: 26 }) %> <%= review.authorName %></a>
+      <span class="muted"><%= new Date(review.createdAt).toLocaleDateString('ko-KR') %></span>
+      <span class="muted">👁 <%= review.views || 0 %></span>
+    </div>
+
+    <% if (review.movieGenre) { %>
+      <div class="genre-tags">
+        <% review.movieGenre.split(',').forEach(g => { %>
+          <% if (g.trim()) { %>
+            <a href="/reviews?genre=<%= encodeURIComponent(g.trim()) %>" class="genre-tag"><%= g.trim() %></a>
+          <% } %>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <div class="review-body"><%= review.content %></div>
+
+    <!-- 좋아요 버튼 -->
+    <div class="like-section">
+      <% if (currentUser) { %>
+        <button class="btn like-btn" id="likeBtn" data-id="<%= review.id %>">
+          ❤️ <span id="likeCount"><%= review.likes || 0 %></span>
+        </button>
+      <% } else { %>
+        <span class="muted">❤️ <%= review.likes || 0 %></span>
+      <% } %>
+    </div>
+
+    <!-- 수정/삭제 버튼 -->
+    <div class="actions">
+      <a href="/reviews" class="btn">← 목록</a>
+      <% if (currentUser && (currentUser.id === review.authorId || currentUser.username === 'admin')) { %>
+        <a href="/reviews/<%= review.id %>/edit" class="btn">✏️ 수정</a>
+        <form action="/reviews/<%= review.id %>/delete" method="POST"
+              class="inline" data-confirm="정말 삭제하시겠습니까?">
+          <button class="btn danger">🗑 삭제</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- TMDB 영화 정보 (출연·제작) -->
+<% if (typeof tmdb !== 'undefined' && tmdb) { %>
+<section class="tmdb-section">
+  <div class="section-header">
+    <h2><%= tmdb.type === 'tv' ? '📺 작품 정보' : '🎬 영화 정보' %></h2>
+    <% if (tmdb.trailer) { %>
+      <a class="btn sm trailer-btn" href="https://www.youtube.com/watch?v=<%= tmdb.trailer %>" target="_blank" rel="noopener">▶ 예고편 보기</a>
+    <% } %>
+  </div>
+
+  <% if (tmdb.tagline) { %><p class="tmdb-tagline">“<%= tmdb.tagline %>”</p><% } %>
+
+  <div class="tmdb-facts">
+    <% if (tmdb.director) { %>
+      <div class="fact"><span class="fact-k">감독</span><span class="fact-v"><a href="/movies/person/<%= tmdb.director.id %>"><%= tmdb.director.name %></a></span></div>
+    <% } %>
+    <% if (tmdb.runtime) { %>
+      <div class="fact"><span class="fact-k">상영시간</span><span class="fact-v"><%= tmdb.runtime %>분</span></div>
+    <% } %>
+    <% if (tmdb.country) { %>
+      <div class="fact"><span class="fact-k">제작국가</span><span class="fact-v"><%= tmdb.country %></span></div>
+    <% } %>
+    <% if (tmdb.voteAverage) { %>
+      <div class="fact"><span class="fact-k">TMDB 평점</span><span class="fact-v">⭐ <%= tmdb.voteAverage %> <span class="muted">(<%= tmdb.voteCount.toLocaleString() %>표)</span></span></div>
+    <% } %>
+  </div>
+
+  <% if (tmdb.cast && tmdb.cast.length) { %>
+    <h3 class="tmdb-subtitle">출연진</h3>
+    <div class="cast-grid">
+      <% tmdb.cast.forEach(c => { %>
+        <a class="cast-card" href="/movies/person/<%= c.id %>">
+          <% if (c.profile) { %>
+            <img class="cast-photo" src="https://image.tmdb.org/t/p/w185<%= c.profile %>" alt="<%= c.name %>" loading="lazy">
+          <% } else { %>
+            <div class="cast-photo no-photo">👤</div>
+          <% } %>
+          <p class="cast-name"><%= c.name %></p>
+          <% if (c.character) { %><p class="cast-role muted"><%= c.character %></p><% } %>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+<% } %>
+
+<!-- 댓글 섹션 -->
+<section class="comment-section">
+  <h2>💬 댓글 <span class="muted">(<%= comments.length %>)</span></h2>
+
+  <% if (currentUser) { %>
+    <form action="/comments" method="POST" class="comment-form">
+      <input type="hidden" name="reviewId" value="<%= review.id %>">
+      <textarea name="content" rows="3" placeholder="감상을 남겨보세요..." required></textarea>
+      <button type="submit" class="btn primary">댓글 작성</button>
+    </form>
+  <% } else { %>
+    <p class="muted"><a href="/login">로그인</a>하면 댓글을 작성할 수 있습니다.</p>
+  <% } %>
+
+  <div class="comment-list">
+    <% if (comments.length === 0) { %>
+      <p class="muted">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>
+    <% } %>
+    <% comments.forEach(c => { %>
+      <div class="comment-item" id="comment-<%= c.id %>">
+        <div class="comment-header">
+          <a href="/users/<%= c.authorId %>" class="author-link"><%- include('../partials/avatar', { src: avatarOf(c.authorId), name: c.authorName, size: 26 }) %> <strong><%= c.authorName %></strong></a>
+          <span class="muted">
+            <%= new Date(c.createdAt).toLocaleDateString('ko-KR') %>
+            <% if (c.updatedAt) { %><em>(수정됨)</em><% } %>
+          </span>
+        </div>
+
+        <!-- 보기 모드 -->
+        <p class="comment-body" data-view><%= c.content %></p>
+
+        <!-- 수정 모드 (작성자 본인만, 기본 숨김) -->
+        <% if (currentUser && currentUser.id === c.authorId) { %>
+          <form action="/comments/<%= c.id %>/edit" method="POST" class="comment-edit-form" data-edit hidden>
+            <input type="hidden" name="reviewId" value="<%= review.id %>">
+            <textarea name="content" rows="2" required maxlength="500"><%= c.content %></textarea>
+            <div class="comment-actions">
+              <button type="submit" class="btn sm primary">저장</button>
+              <button type="button" class="btn sm" data-cancel-edit="<%= c.id %>">취소</button>
+            </div>
+          </form>
+        <% } %>
+
+        <% if (currentUser && (currentUser.id === c.authorId || currentUser.username === 'admin')) { %>
+          <div class="comment-actions" data-actions>
+            <% if (currentUser.id === c.authorId) { %>
+              <button type="button" class="btn sm" data-edit-btn="<%= c.id %>">수정</button>
+            <% } %>
+            <form action="/comments/<%= c.id %>/delete" method="POST"
+                  class="inline" data-confirm="댓글을 삭제하시겠습니까?">
+              <input type="hidden" name="reviewId" value="<%= review.id %>">
+              <button class="btn sm danger">삭제</button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

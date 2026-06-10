@@ -1,0 +1,85 @@
+<%- include('../partials/header', { title: '영화 리뷰' }) %>
+
+<div class="page-header">
+  <h1>🎬 영화 리뷰 <span class="muted" style="font-size:1rem">(<%= totalCount %>건)</span></h1>
+  <% if (currentUser) { %>
+    <a href="/reviews/search" class="btn primary">+ 리뷰 작성</a>
+  <% } else { %>
+    <a href="/login" class="btn">로그인 후 작성</a>
+  <% } %>
+</div>
+
+<!-- 검색 + 필터 + 정렬 -->
+<form class="filter-bar" method="GET" action="/reviews">
+  <input class="search-input" type="text" name="q" value="<%= q %>" placeholder="영화 제목 또는 감상문 검색...">
+
+  <select name="genre" class="select-box">
+    <option value="">전체 장르</option>
+    <% allGenres.forEach(g => { %>
+      <option value="<%= g %>" <%= genre === g ? 'selected' : '' %>><%= g %></option>
+    <% }) %>
+  </select>
+
+  <select name="sort" class="select-box">
+    <option value="newest"  <%= sort === 'newest'  ? 'selected' : '' %>>🕐 최신 리뷰순</option>
+    <option value="rating"  <%= sort === 'rating'  ? 'selected' : '' %>>⭐ 사용자 별점 높은순</option>
+    <option value="popular" <%= sort === 'popular' ? 'selected' : '' %>>❤️ 좋아요 많은순</option>
+    <option value="views"   <%= sort === 'views'   ? 'selected' : '' %>>👁 조회수 많은순</option>
+  </select>
+
+  <button type="submit" class="btn primary">검색</button>
+  <a href="/reviews" class="btn">초기화</a>
+</form>
+
+<!-- 리뷰 목록 -->
+<% if (reviews.length === 0) { %>
+  <div class="empty-state">
+    <p>검색 결과가 없습니다 🎬</p>
+    <a href="/reviews" class="btn">전체 리뷰 보기</a>
+  </div>
+<% } else { %>
+  <div class="movie-grid">
+    <% reviews.forEach(r => { %>
+      <a href="/reviews/<%= r.id %>" class="movie-card">
+        <% if (r.moviePoster) { %>
+          <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>"
+               alt="<%= r.movieTitle %>" class="movie-poster">
+        <% } else { %>
+          <div class="movie-poster no-poster">🎬</div>
+        <% } %>
+        <div class="movie-info">
+          <p class="movie-title"><%= r.movieTitle %></p>
+          <% if (r.movieYear) { %><p class="muted" style="font-size:0.8rem"><%= r.movieYear %></p><% } %>
+          <div class="movie-meta">
+            <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+          </div>
+          <div class="movie-meta">
+            <span class="muted">❤️ <%= r.likes || 0 %></span>
+            <span class="muted">👁 <%= r.views || 0 %></span>
+          </div>
+          <p class="movie-author">by <strong><%= r.authorName %></strong></p>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <% if (totalPages > 1) { %>
+  <nav class="pagination">
+    <% if (currentPage > 1) { %>
+      <a href="/reviews?q=<%= q %>&sort=<%= sort %>&genre=<%= genre %>&page=<%= currentPage - 1 %>" class="page-btn">‹ 이전</a>
+    <% } %>
+
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="/reviews?q=<%= q %>&sort=<%= sort %>&genre=<%= genre %>&page=<%= i %>"
+         class="page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+      <a href="/reviews?q=<%= q %>&sort=<%= sort %>&genre=<%= genre %>&page=<%= currentPage + 1 %>" class="page-btn">다음 ›</a>
+    <% } %>
+  </nav>
+  <% } %>
+<% } %>
+
+<%- include('../partials/footer') %>

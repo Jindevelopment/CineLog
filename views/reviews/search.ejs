@@ -1,0 +1,139 @@
+<%- include('../partials/header', { title: '검색' }) %>
+
+<%
+  // 카테고리(둘러보기) 목록 — 영화/TV 별
+  const cats = type === 'tv'
+    ? [{ v: 'popular', label: '🔥 인기' }, { v: 'top_rated', label: '⭐ 평점 높은' }, { v: 'on_the_air', label: '📡 방영 중' }, { v: 'airing_today', label: '📅 오늘 방영' }]
+    : [{ v: 'popular', label: '🔥 인기' }, { v: 'top_rated', label: '⭐ 평점 높은' }, { v: 'now_playing', label: '🎬 상영중' }, { v: 'upcoming', label: '📅 개봉예정' }]
+  const catLabel = Object.fromEntries(cats.map(c => [c.v, c.label]))
+  // 국가 필터
+  const countries = [{ v: '', label: '🌐 전체' }, { v: 'ko', label: '🇰🇷 국내' }, { v: 'foreign', label: '🌍 해외' }]
+  const countryLabel = { ko: '🇰🇷 국내', foreign: '🌍 해외' }
+  const gp = genre ? '&genre=' + encodeURIComponent(genre) : ''   // 장르 쿼리 조각
+%>
+
+<div class="search-hero">
+  <h1>🔍 작품 검색</h1>
+  <p class="muted">보고 싶은 영화·TV 프로그램을 검색하거나 카테고리로 둘러보세요</p>
+</div>
+
+<!-- 영화 / TV 세그먼트 탭 -->
+<div class="type-tabs">
+  <a href="/reviews/search?type=movie<%= q ? '&q=' + encodeURIComponent(q) : '' %><%= country ? '&country=' + country : '' %>"
+     class="type-tab <%= type !== 'tv' ? 'active' : '' %>">🎬 영화</a>
+  <a href="/reviews/search?type=tv<%= q ? '&q=' + encodeURIComponent(q) : '' %><%= country ? '&country=' + country : '' %>"
+     class="type-tab <%= type === 'tv' ? 'active' : '' %>">📺 TV 프로그램</a>
+</div>
+
+<!-- 검색 패널 -->
+<form class="search-panel" method="GET" action="/reviews/search">
+  <input type="hidden" name="type" value="<%= type %>">
+  <input type="hidden" name="browse" value="<%= q ? '' : browse %>">
+  <input type="hidden" name="country" value="<%= country %>">
+
+  <!-- 메인 검색 줄 -->
+  <div class="search-main">
+    <span class="search-ico" aria-hidden="true">🔍</span>
+    <input class="search-input-lg" type="text" name="q" value="<%= q %>"
+           placeholder="<%= type === 'tv' ? 'TV 프로그램 제목을 입력하세요...' : '영화 제목을 입력하세요...' %>">
+    <button type="submit" class="btn primary search-go">검색</button>
+  </div>
+
+  <div class="search-filters">
+    <!-- 국가 필터 칩 -->
+    <div class="sf-row">
+      <span class="sf-label">국가</span>
+      <div class="browse-chips">
+        <% countries.forEach(c => { %>
+          <a class="cat-chip <%= country === c.v ? 'active' : '' %>"
+             href="/reviews/search?type=<%= type %><%= q ? '&q=' + encodeURIComponent(q) : '&browse=' + browse %><%= gp %><%= c.v ? '&country=' + c.v : '' %>"><%= c.label %></a>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- 둘러보기 카테고리 칩 -->
+    <div class="sf-row">
+      <span class="sf-label">둘러보기</span>
+      <div class="browse-chips">
+        <% cats.forEach(c => { %>
+          <a class="cat-chip <%= (browse === c.v && !q) ? 'active' : '' %>"
+             href="/reviews/search?type=<%= type %>&browse=<%= c.v %><%= gp %><%= country ? '&country=' + country : '' %>"><%= c.label %></a>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- 장르 필터 + (검색 시) 정렬 + 초기화 -->
+    <div class="sf-row">
+      <label class="sf-inline">
+        <span class="sf-label">장르</span>
+        <select name="genre" class="select-box" onchange="this.form.submit()">
+          <option value="">전체 장르</option>
+          <% searchGenres.forEach(g => { %>
+            <option value="<%= g %>" <%= genre === g ? 'selected' : '' %>><%= g %></option>
+          <% }) %>
+        </select>
+      </label>
+
+      <% if (q) { %>
+        <label class="sf-inline">
+          <span class="sf-label">정렬</span>
+          <select name="tsort" class="select-box" onchange="this.form.submit()">
+            <option value="default"     <%= tsort === 'default'     ? 'selected' : '' %>>🎯 관련도순</option>
+            <option value="rating_desc" <%= tsort === 'rating_desc' ? 'selected' : '' %>>⭐ 평점 높은순</option>
+            <option value="date_desc"   <%= tsort === 'date_desc'   ? 'selected' : '' %>>🕐 최신순</option>
+          </select>
+        </label>
+      <% } %>
+
+      <a href="/reviews/search?type=<%= type %>" class="btn sf-reset">↺ 초기화</a>
+    </div>
+  </div>
+</form>
+
+<!-- 결과 헤딩 -->
+<% const countryTag = country ? `<span class="muted" style="font-size:1rem">· ${countryLabel[country]}</span>` : '' %>
+<% if (q) { %>
+  <div class="result-head">
+    <h2>"<%= q %>" 검색 결과 <span class="muted" style="font-size:1rem">(<%= movies.length %>건)</span><%- countryTag %></h2>
+  </div>
+<% } else if (browse) { %>
+  <div class="result-head">
+    <h2><%= (catLabel[browse] || '🔥 인기') %> <%= type === 'tv' ? '프로그램' : '영화' %><% if (genre) { %> <span class="muted" style="font-size:1rem">· <%= genre %></span><% } %><%- countryTag %></h2>
+  </div>
+<% } %>
+
+<!-- 검색 결과 없음 -->
+<% if (movies.length === 0) { %>
+  <div class="empty-state">
+    <p><% if (q) { %>"<%= q %>" 검색 결과가 없습니다 🎬<% } else { %>표시할 작품이 없습니다.<% } %></p>
+  </div>
+<% } else { %>
+  <div class="movie-grid">
+    <% movies.forEach(m => { %>
+      <div class="movie-card">
+        <a href="/movies/<%= type %>/<%= m.id %>" class="movie-poster-link">
+        <% if (m.poster_path) { %>
+          <img src="https://image.tmdb.org/t/p/w300<%= m.poster_path %>" alt="<%= m.title %>" class="movie-poster">
+        <% } else { %>
+          <div class="movie-poster no-poster"><%= type === 'tv' ? '📺' : '🎬' %></div>
+        <% } %>
+        </a>
+        <div class="movie-info">
+          <a href="/movies/<%= type %>/<%= m.id %>" class="movie-title-link"><p class="movie-title"><%= m.title %></p></a>
+          <p class="muted" style="font-size:0.82rem">
+            <%= m.release_date ? m.release_date.slice(0,4) : '' %>
+            <% if (m.vote_average) { %>· ⭐ <%= m.vote_average.toFixed(1) %><% } %>
+            <span class="type-badge <%= type === 'tv' ? 'badge-tv' : 'badge-movie' %>"><%= type === 'tv' ? 'TV' : '영화' %></span>
+          </p>
+          <% if (m.overview) { %>
+            <p class="movie-overview"><%= m.overview.slice(0, 60) %>...</p>
+          <% } %>
+          <a href="/reviews/new?movieId=<%= m.id %>&movieTitle=<%= encodeURIComponent(m.title) %>&moviePoster=<%= encodeURIComponent(m.poster_path || '') %>&movieYear=<%= m.release_date ? m.release_date.slice(0,4) : '' %>&movieGenre=<%= encodeURIComponent(m.genre_names || '') %>&mediaType=<%= type %>"
+             class="btn primary sm full" style="margin-top:10px">✍️ 리뷰 쓰기</a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

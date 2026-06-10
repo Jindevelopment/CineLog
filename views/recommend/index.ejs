@@ -1,0 +1,176 @@
+<%- include('../partials/header', { title: 'AI 무비봇' }) %>
+
+<div class="ai-page">
+  <!-- 헤더 -->
+  <div class="ai-head">
+    <div class="ai-head-icon">🎬</div>
+    <div>
+      <h1 class="ai-head-title">CineLog 무비봇</h1>
+      <p class="ai-head-sub">작품의 <b>줄거리·정보</b>를 물어보거나, <b>줄거리·배우·장면</b>을 설명하면 그 작품을 <b>찾아드려요.</b></p>
+    </div>
+  </div>
+
+  <!-- 채팅 메시지 영역 -->
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg ai">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-bubble">
+        <p>안녕하세요! 무엇이 궁금하신가요?</p>
+        <p class="ai-hint-line">예를 들어 이렇게 물어보세요 👇</p>
+        <div class="chips">
+          <span class="chips-label">📖 줄거리·정보</span>
+          <button class="chip" onclick="setInput('기생충 줄거리 알려줘')">기생충 줄거리</button>
+          <button class="chip" onclick="setInput('인터스텔라는 어떤 내용이야?')">인터스텔라 내용</button>
+        </div>
+        <div class="chips">
+          <span class="chips-label">🔎 작품 찾기</span>
+          <button class="chip" onclick="setInput('기억을 잃은 주인공이 몸에 문신으로 단서를 남기는 영화 찾아줘')">문신으로 단서 남기는 영화</button>
+          <button class="chip" onclick="setInput('꿈 속에 들어가서 생각을 훔치는 영화가 뭐였지?')">꿈 속에서 생각을 훔치는 영화</button>
+          <button class="chip" onclick="setInput('마동석이 형사로 나오는 범죄 액션 영화 찾아줘')">마동석 형사 영화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 입력창 -->
+  <div class="ai-composer">
+    <textarea id="aiInput" class="ai-textarea" rows="1"
+      placeholder="줄거리를 묻거나, 찾고 싶은 작품을 설명해 보세요..."></textarea>
+    <button class="ai-send" id="aiSend" onclick="sendMessage()" aria-label="전송">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <p class="ai-foot-hint">Enter 전송 · Shift+Enter 줄바꿈</p>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+const aiMessages = document.getElementById('aiMessages')
+const aiInput    = document.getElementById('aiInput')
+const aiSend     = document.getElementById('aiSend')
+let chatHistory  = []
+
+aiInput.addEventListener('input', () => {
+  aiInput.style.height = 'auto'
+  aiInput.style.height = Math.min(aiInput.scrollHeight, 140) + 'px'
+})
+aiInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
+})
+function setInput(text) {
+  aiInput.value = text
+  aiInput.focus()
+  aiInput.dispatchEvent(new Event('input'))
+}
+
+async function sendMessage() {
+  const msg = aiInput.value.trim()
+  if (!msg || aiSend.disabled) return
+
+  appendUser(msg)
+  aiInput.value = ''
+  aiInput.style.height = 'auto'
+  aiSend.disabled = true
+
+  const loadId = appendLoading()
+  try {
+    const res  = await fetch('/recommend/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory })
+    })
+    const data = await res.json()
+    removeEl(loadId)
+
+    if (data.error) {
+      appendAI(data.error, [], 'chat', true)
+    } else {
+      appendAI(data.message, data.items || [], data.intent)
+      chatHistory.push({ role: 'user', content: msg })
+      chatHistory.push({ role: 'assistant', content: data.message })
+      if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16)
+    }
+  } catch {
+    removeEl(loadId)
+    appendAI('오류가 발생했어요. 잠시 후 다시 시도해 주세요.', [], 'chat', true)
+  } finally {
+    aiSend.disabled = false
+    aiInput.focus()
+  }
+}
+
+function appendUser(text) {
+  const d = document.createElement('div')
+  d.className = 'ai-msg user'
+  d.innerHTML = `<div class="ai-bubble user-bubble">${esc(text)}</div>`
+  aiMessages.appendChild(d); scrollDown()
+}
+
+function appendAI(text, items, intent, isErr) {
+  const d = document.createElement('div')
+  d.className = 'ai-msg ai'
+
+  let label = ''
+  if (intent === 'info')     label = '<span class="intent-tag tag-info">📖 작품 정보</span>'
+  if (intent === 'identify') label = '<span class="intent-tag tag-find">🔎 이 작품일 거예요</span>'
+
+  let cards = ''
+  if (items && items.length) {
+    cards = '<div class="rec-cards">' + items.map(item => {
+      const t = item.tmdb || {}
+      const posterUrl = t.poster ? `https://image.tmdb.org/t/p/w185${t.poster}` : null
+      const posterHtml = posterUrl
+        ? `<img src="${posterUrl}" alt="" class="rec-poster" onerror="this.outerHTML='<div class=rec-poster-empty>${item.type==='tv'?'📺':'🎬'}</div>'">`
+        : `<div class="rec-poster-empty">${item.type==='tv'?'📺':'🎬'}</div>`
+
+      const year   = t.year || item.year || ''
+      const rating = t.rating > 0 ? `<span class="rec-rating">⭐ ${t.rating}</span>` : ''
+      const typeBadge = `<span class="rec-type ${item.type==='tv'?'is-tv':'is-movie'}">${item.type==='tv'?'TV':'영화'}</span>`
+      const genre  = item.genre ? `<span class="rec-genre">${esc(item.genre)}</span>` : ''
+      const plot   = t.overview || item.reason || ''
+
+      const tmdbId = t.id, poster = t.poster || ''
+      const reviewBtn = tmdbId
+        ? `<a class="btn primary sm" href="/reviews/new?movieId=${tmdbId}&movieTitle=${encodeURIComponent(item.title)}&moviePoster=${encodeURIComponent(poster)}&movieYear=${year}&movieGenre=${encodeURIComponent(item.genre||'')}&mediaType=${item.type}">✍️ 리뷰 쓰기</a>`
+        : ''
+      const detailType = item.type === 'tv' ? 'tv' : 'movie'
+      const searchBtn = tmdbId
+        ? `<a class="btn sm" href="/movies/${detailType}/${tmdbId}">🔍 더보기</a>`
+        : `<a class="btn sm" href="/reviews/search?q=${encodeURIComponent(item.title)}&type=${item.type}">🔍 더보기</a>`
+
+      return `
+        <div class="rec-card">
+          <div class="rec-poster-wrap">${posterHtml}</div>
+          <div class="rec-body">
+            <div class="rec-title">${esc(item.title)} ${year?`<span class="rec-year">(${year})</span>`:''}</div>
+            <div class="rec-meta">${typeBadge}${genre}${rating}</div>
+            <p class="rec-plot">${esc(plot)}</p>
+            <div class="rec-btns">${reviewBtn}${searchBtn}</div>
+          </div>
+        </div>`
+    }).join('') + '</div>'
+  }
+
+  d.innerHTML = `
+    <div class="ai-avatar">🤖</div>
+    <div class="ai-bubble${isErr?' err-bubble':''}">
+      ${label}
+      <p class="ai-text">${esc(text)}</p>
+      ${cards}
+    </div>`
+  aiMessages.appendChild(d); scrollDown()
+}
+
+function appendLoading() {
+  const id = 'ld' + Date.now()
+  const d  = document.createElement('div')
+  d.className = 'ai-msg ai'; d.id = id
+  d.innerHTML = `<div class="ai-avatar">🤖</div><div class="ai-bubble load-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`
+  aiMessages.appendChild(d); scrollDown()
+  return id
+}
+function removeEl(id){ document.getElementById(id)?.remove() }
+function scrollDown(){ aiMessages.scrollTop = aiMessages.scrollHeight }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+</script>

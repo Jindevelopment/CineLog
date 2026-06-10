@@ -1,0 +1,128 @@
+<%- include('../partials/header', { title: '관리자 대시보드' }) %>
+
+<div class="page-header">
+  <h1>⚙️ 관리자 대시보드</h1>
+  <span class="admin-badge">ADMIN</span>
+</div>
+
+<!-- 전체 통계 카드 -->
+<div class="admin-stats">
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.totalUsers %></span>
+    <span class="admin-stat-label">전체 회원</span>
+  </div>
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.totalReviews %></span>
+    <span class="admin-stat-label">전체 리뷰</span>
+  </div>
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.totalComments %></span>
+    <span class="admin-stat-label">전체 댓글</span>
+  </div>
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.totalViews %></span>
+    <span class="admin-stat-label">총 조회수</span>
+  </div>
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.totalLikes %></span>
+    <span class="admin-stat-label">총 좋아요</span>
+  </div>
+  <div class="admin-stat-card">
+    <span class="admin-stat-num"><%= stats.avgRating %></span>
+    <span class="admin-stat-label">평균 별점</span>
+  </div>
+  <div class="admin-stat-card highlight">
+    <span class="admin-stat-num"><%= stats.newUsersThisWeek %></span>
+    <span class="admin-stat-label">이번 주 신규 가입</span>
+  </div>
+</div>
+
+<div class="admin-grid">
+  <!-- 인기 영화 TOP 5 -->
+  <div class="admin-panel">
+    <h2>🎬 가장 많이 리뷰된 영화 TOP 5</h2>
+    <% if (topMovies.length === 0) { %>
+      <p class="muted">데이터 없음</p>
+    <% } else { %>
+      <table class="table">
+        <thead><tr><th>#</th><th>영화</th><th>리뷰 수</th><th>평균 별점</th></tr></thead>
+        <tbody>
+          <% topMovies.forEach((m, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= m.title %></td>
+              <td><%= m.count %>건</td>
+              <td>⭐ <%= m.avgRating %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+
+  <!-- 활발한 유저 TOP 5 -->
+  <div class="admin-panel">
+    <h2>👑 활발한 유저 TOP 5</h2>
+    <% if (topUsers.length === 0) { %>
+      <p class="muted">데이터 없음</p>
+    <% } else { %>
+      <table class="table">
+        <thead><tr><th>#</th><th>유저</th><th>리뷰 수</th></tr></thead>
+        <tbody>
+          <% topUsers.forEach((u, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= u.username %></td>
+              <td><%= u.reviews %>건</td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+
+  <!-- 장르별 분포 -->
+  <div class="admin-panel">
+    <h2>🎭 장르별 리뷰 분포</h2>
+    <% if (genreStats.length === 0) { %>
+      <p class="muted">데이터 없음</p>
+    <% } else { %>
+      <% const maxCount = genreStats[0][1] %>
+      <% genreStats.forEach(([genre, count]) => { %>
+        <div class="genre-bar-wrap">
+          <span class="genre-bar-label"><%= genre %></span>
+          <div class="genre-bar-bg">
+            <div class="genre-bar-fill" data-pct="<%= Math.round(count/maxCount*100) %>"></div>
+          </div>
+          <span class="genre-bar-count"><%= count %></span>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <!-- 최근 가입 유저 -->
+  <div class="admin-panel">
+    <h2>🆕 최근 가입 회원</h2>
+    <table class="table">
+      <thead><tr><th>아이디</th><th>가입일</th><th>관리</th></tr></thead>
+      <tbody>
+        <% recentUsers.forEach(u => { %>
+          <tr>
+            <td><a href="/users/<%= u.id %>"><%= u.username %></a></td>
+            <td><%= new Date(u.createdAt).toLocaleDateString('ko-KR') %></td>
+            <td>
+              <% if (u.username !== 'admin') { %>
+                <form action="/admin/users/<%= u.id %>/delete" method="POST"
+                      class="inline" data-confirm="<%= u.username %> 유저를 삭제하시겠습니까?">
+                  <button class="btn sm danger">삭제</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

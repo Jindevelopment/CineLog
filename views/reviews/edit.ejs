@@ -1,0 +1,56 @@
+<%- include('../partials/header', { title: '리뷰 수정' }) %>
+
+<div class="page-header">
+  <h1>✏️ 리뷰 수정</h1>
+</div>
+
+<% if (error) { %><p class="error"><%= error %></p><% } %>
+
+<div class="review-form-wrap">
+  <!-- 영화 정보 표시 -->
+  <div class="selected-movie">
+    <% if (review.moviePoster) { %>
+      <img src="https://image.tmdb.org/t/p/w154<%= review.moviePoster %>"
+           alt="<%= review.movieTitle %>" class="selected-poster">
+    <% } %>
+    <div>
+      <p class="movie-title" style="font-size:1.2rem"><%= review.movieTitle %></p>
+      <% if (review.movieYear) { %><p class="muted"><%= review.movieYear %>년 개봉</p><% } %>
+    </div>
+  </div>
+
+  <form action="/reviews/<%= review.id %>/edit" method="POST" class="form">
+    <label>
+      별점 <span class="required">*</span>
+      <div class="star-select" id="starSelect">
+        <% for (let i = 1; i <= 5; i++) { %>
+          <span class="star-opt <%= i <= review.rating ? 'selected' : '' %>" data-val="<%= i %>">★</span>
+        <% } %>
+        <input type="hidden" name="rating" id="ratingInput" value="<%= review.rating %>" required>
+        <span class="star-hint muted"><%= review.rating %>점</span>
+      </div>
+    </label>
+
+    <label>
+      관람 상태
+      <select name="status" class="select-box">
+        <option value="watched"  <%= review.status === 'watched'  ? 'selected' : '' %>>✅ 봤어요</option>
+        <option value="watching" <%= review.status === 'watching' ? 'selected' : '' %>>⏳ 보는 중</option>
+        <option value="want"     <%= review.status === 'want'     ? 'selected' : '' %>>🔖 보고싶어요</option>
+        <option value="drop"     <%= review.status === 'drop'     ? 'selected' : '' %>>❌ 안 볼래요</option>
+      </select>
+    </label>
+
+    <label>
+      감상문 <span class="required">*</span>
+      <textarea name="content" rows="6" required><%= review.content %></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="btn primary">수정 저장</button>
+      <a href="/reviews/<%= review.id %>" class="btn">취소</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

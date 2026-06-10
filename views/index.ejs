@@ -1,0 +1,105 @@
+<%- include('partials/header', { title: '홈' }) %>
+
+<!-- 히어로 섹션 -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>나만의 영화 기록,<br><span class="accent">CineLog</span></h1>
+    <p class="lead">본 영화를 기록하고, 감상을 나누고,<br>취향이 담긴 나만의 영화 일지를 만들어보세요.</p>
+    <% if (currentUser) { %>
+      <div class="hero-actions">
+        <a href="/reviews/search" class="btn primary">🔍 영화 검색하기</a>
+        <a href="/mypage" class="btn">📋 내 기록 보기</a>
+      </div>
+    <% } else { %>
+      <div class="hero-actions">
+        <a href="/signup" class="btn primary">시작하기</a>
+        <a href="/login" class="btn">로그인</a>
+      </div>
+    <% } %>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <span class="stat-num"><%= stats.totalReviews %></span>
+      <span class="stat-label">리뷰</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num"><%= stats.totalUsers %></span>
+      <span class="stat-label">회원</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num"><%= stats.totalComments %></span>
+      <span class="stat-label">댓글</span>
+    </div>
+  </div>
+</section>
+
+<!-- 인기 리뷰 -->
+<% if (popularReviews.length > 0) { %>
+<section class="section">
+  <div class="section-header">
+    <h2>🔥 인기 리뷰</h2>
+    <a href="/reviews?sort=popular" class="see-all">전체보기 →</a>
+  </div>
+  <div class="movie-grid">
+    <% popularReviews.forEach(r => { %>
+      <a href="/reviews/<%= r.id %>" class="movie-card">
+        <% if (r.moviePoster) { %>
+          <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+        <% } else { %>
+          <div class="movie-poster no-poster">🎬</div>
+        <% } %>
+        <div class="movie-info">
+          <p class="movie-title"><%= r.movieTitle %></p>
+          <div class="movie-meta">
+            <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+            <span class="muted">❤️ <%= r.likes || 0 %></span>
+          </div>
+          <p class="movie-author">by <%= r.authorName %></p>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<!-- 최근 리뷰 -->
+<% if (recentReviews.length > 0) { %>
+<section class="section">
+  <div class="section-header">
+    <h2>🕐 최근 리뷰</h2>
+    <a href="/reviews?sort=newest" class="see-all">전체보기 →</a>
+  </div>
+  <div class="movie-grid">
+    <% recentReviews.forEach(r => { %>
+      <a href="/reviews/<%= r.id %>" class="movie-card">
+        <% if (r.moviePoster) { %>
+          <img src="https://image.tmdb.org/t/p/w300<%= r.moviePoster %>" alt="<%= r.movieTitle %>" class="movie-poster">
+        <% } else { %>
+          <div class="movie-poster no-poster">🎬</div>
+        <% } %>
+        <div class="movie-info">
+          <p class="movie-title"><%= r.movieTitle %></p>
+          <div class="movie-meta">
+            <span class="stars"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5 - r.rating) %></span>
+            <span class="muted">👁 <%= r.views || 0 %></span>
+          </div>
+          <p class="movie-author">by <%= r.authorName %></p>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<% if (recentReviews.length === 0) { %>
+  <section class="section empty-state">
+    <p>아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요! 🎬</p>
+    <% if (currentUser) { %>
+      <a href="/reviews/search" class="btn primary">영화 검색하기</a>
+    <% } else { %>
+      <a href="/signup" class="btn primary">회원가입하기</a>
+    <% } %>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>
