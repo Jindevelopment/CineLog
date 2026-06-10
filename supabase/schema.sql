@@ -94,6 +94,9 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- 보안: SECURITY DEFINER 함수의 직접 실행 권한 회수 (트리거 실행엔 영향 없음)
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
 -- ============================================================
 --  RLS (Row Level Security)
 --  서버는 service_role 키로 접근하므로 정책을 우회합니다.
