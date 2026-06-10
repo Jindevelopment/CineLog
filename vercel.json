@@ -1,14 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
+  "regions": ["icn1"],
   "builds": [
-    {
-      "src": "app.js",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["views/**", "public/**"] }
-    }
+    { "src": "app.js", "use": "@vercel/node", "config": { "includeFiles": ["views/**"] } },
+    { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/style.css", "dest": "/public/style.css" },
+    { "src": "/main.js", "dest": "/public/main.js" },
+    { "src": "/uploads/(.*)", "dest": "/public/uploads/$1" },
     { "src": "/(.*)", "dest": "/app.js" }
   ]
 }

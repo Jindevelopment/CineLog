@@ -27,19 +27,31 @@ app.use(express.json())
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
+// ─── 프로필 캐시 (avatarOf용 — 매 요청 전체조회 방지, 15초 TTL) ──
+let _profCache = null, _profCacheAt = 0
+async function getProfilesMap() {
+  if (_profCache && Date.now() - _profCacheAt < 15000) return _profCache
+  const { data } = await supaAdmin.from('profiles').select('id, username, avatar, is_admin')
+  _profCache = new Map((data || []).map(p => [p.id, p]))
+  _profCacheAt = Date.now()
+  return _profCache
+}
+
 // ─── 인증 + 공통 로컬 변수 ────────────────────────────
 app.use(async (req, res, next) => {
+  res.set('Cache-Control', 'no-store')   // 동적 페이지 캐시/bfcache 방지 (조회수 즉시 반영)
   try {
     req.supabase = createServerSupabase(req, res)
 
-    // 현재 로그인 사용자 (Supabase JWT 검증)
-    const { data: { user } } = await req.supabase.auth.getUser()
-
-    // 전체 프로필을 한 번에 불러와 동기 헬퍼(avatarOf)에 사용
-    const { data: profiles } = await supaAdmin
-      .from('profiles').select('id, username, avatar, is_admin')
-    const pmap = new Map((profiles || []).map(p => [p.id, p]))
+    const pmap = await getProfilesMap()
     res.locals.avatarOf = (userId) => pmap.get(userId)?.avatar || null
+
+    // 인증 쿠키가 있을 때만 Supabase JWT 검증 (익명 방문자는 네트워크 호출 생략 → 속도 ↑)
+    let user = null
+    if (/sb-[\w-]*-auth-token/.test(req.headers.cookie || '')) {
+      const { data } = await req.supabase.auth.getUser()
+      user = data?.user || null
+    }
 
     if (user) {
       const p = pmap.get(user.id)
