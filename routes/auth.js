@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js'
 import { supaAdmin } from '../lib/supabase.js'
 
 const router = express.Router()
-const SITE_URL = process.env.SITE_URL || 'http://localhost:3000'
+// 끝 슬래시 제거 (SITE_URL//auth/callback 같은 이중 슬래시 방지)
+const SITE_URL = (process.env.SITE_URL || 'http://localhost:3000').replace(/\/+$/, '')
 
 // ─── 인증 미들웨어 (다른 라우터에서 import) ───────────────
 export function requireLogin(req, res, next) {

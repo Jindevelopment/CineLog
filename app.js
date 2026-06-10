@@ -66,6 +66,14 @@ app.use(async (req, res, next) => {
 
 // ─── 홈 ───────────────────────────────────────────────
 app.get('/', async (req, res) => {
+  // OAuth/이메일 인증이 루트로 돌아온 경우(?code=...) 세션 교환 후 정리
+  if (req.query.code) {
+    try {
+      const { error } = await req.supabase.auth.exchangeCodeForSession(req.query.code)
+      if (error) console.error('루트 코드 교환 오류:', error.message)
+    } catch (e) { console.error('루트 코드 교환 예외:', e.message) }
+    return res.redirect('/')
+  }
   try {
     const { data: rows } = await supaAdmin
       .from('reviews').select(REVIEW_SELECT)
