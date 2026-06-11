@@ -13,6 +13,7 @@ scripts/_body*.json
 
 # Claude / 에디터 / OS
 .claude/
+.playwright-mcp/
 .vscode/
 .idea/
 .DS_Store
